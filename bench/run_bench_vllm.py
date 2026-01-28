@@ -61,8 +61,15 @@ def main():
     ap.add_argument("--workload", required=True)
     ap.add_argument("--concurrency", type=int, nargs="+", required=True)
     ap.add_argument("--out", required=True)
-    args = ap.parse_args()
 
+    # NEW: warmup rounds per concurrency
+    ap.add_argument(
+        "--warmup",
+        type=int,
+        default=0,
+        help="number of warmup rounds per concurrency (results are discarded)",
+    )
+    args = ap.parse_args()
     workload = []
     with open(args.workload, "rb") as f:
         for line in f:
@@ -74,9 +81,13 @@ def main():
     with out.open("wb") as f:
         for c in args.concurrency:
             print(f"Running concurrency = {c}")
-            results = asyncio.run(
-                run_once(args.base_url, args.model, workload, c)
-            )
+             # NEW: warmup (discard results)
+            for i in range(args.warmup):
+                print(f"  Warmup {i + 1}/{args.warmup}")
+                asyncio.run(run_once(args.base_url, args.model, workload, c))
+
+            # measure
+            results = asyncio.run(run_once(args.base_url, args.model, workload, c))
             for r in results:
                 r["concurrency"] = c
                 f.write(orjson.dumps(r))
