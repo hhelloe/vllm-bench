@@ -69,6 +69,9 @@ def main():
         default=0,
         help="number of warmup rounds per concurrency (results are discarded)",
     )
+    ap.add_argument("--warmup-samples", type=int, default=0,
+                help="how many requests to use in warmup (0 means use full workload)")
+
     args = ap.parse_args()
     workload = []
     with open(args.workload, "rb") as f:
@@ -82,9 +85,15 @@ def main():
         for c in args.concurrency:
             print(f"Running concurrency = {c}")
              # NEW: warmup (discard results)
+
+            if args.warmup_samples and args.warmup_samples > 0:
+                warmup_workload = workload[: args.warmup_samples]
+            else:
+                warmup_workload = workload
+            
             for i in range(args.warmup):
-                print(f"  Warmup {i + 1}/{args.warmup}")
-                asyncio.run(run_once(args.base_url, args.model, workload, c))
+                print(f"  Warmup {i + 1}/{args.warmup} (samples={len(warmup_workload)})")
+                asyncio.run(run_once(args.base_url, args.model, warmup_workload, c))
 
             # measure
             results = asyncio.run(run_once(args.base_url, args.model, workload, c))

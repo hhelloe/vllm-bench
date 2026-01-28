@@ -10,4 +10,5 @@ python bench/run_bench_vllm.py \
   --workload workloads/test.jsonl \
   --concurrency 1 2 4 8 16 \
   --out results/raw/vllm_raw.jsonl \
-  --warmup 10
+  --warmup 1 \
+  --warmup-samples 10
