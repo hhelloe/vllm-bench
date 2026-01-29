@@ -9,11 +9,13 @@ import httpx
 
 async def send_one(client, sem, req, model):
     """
-    发送单个请求，测 TTFT / total time
+    发送单个请求，测 TTFT / total time / TPOT
+    TPOT = (total - ttft) / (token_count - 1)
     """
     async with sem:
         t0 = time.perf_counter()
         ttft = None
+        token_count = 0
 
         async with client.stream(
             "POST",
@@ -32,14 +34,33 @@ async def send_one(client, sem, req, model):
                     continue
                 if ttft is None:
                     ttft = time.perf_counter() - t0
+                # Count output tokens from streaming chunks
+                if line.startswith("data: "):
+                    data = line[6:]
+                    if data != "[DONE]":
+                        try:
+                            chunk = orjson.loads(data)
+                            if "choices" in chunk:
+                                delta = chunk["choices"][0].get("delta", {})
+                                if "content" in delta or delta.get("reasoning_content"):
+                                    token_count += 1
+                        except orjson.JSONDecodeError:
+                            pass
 
         total = time.perf_counter() - t0
+
+        # Calculate TPOT: (total - ttft) / (token_count - 1)
+        if token_count > 1:
+            tpot = (total - ttft) / (token_count - 1)
+        else:
+            tpot = total  # fallback if only one token
 
     return {
         "id": req["id"],
         "profile": req["profile"],
         "ttft_s": ttft,
         "total_s": total,
+        "tpot_s": tpot,
     }
 
 

@@ -62,8 +62,8 @@ def main():
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
 
-    # groups[(profile, concurrency)] = {"ttft": [...], "total": [...]}
-    groups = defaultdict(lambda: {"ttft": [], "total": []})
+    # groups[(profile, concurrency)] = {"ttft": [...], "total": [...], "tpot": [...]}
+    groups = defaultdict(lambda: {"ttft": [], "total": [], "tpot": []})
 
     with inp.open("r", encoding="utf-8") as f:
         for line in f:
@@ -74,6 +74,7 @@ def main():
             key = (r["profile"], int(r["concurrency"]))
             groups[key]["ttft"].append(r.get("ttft_s"))
             groups[key]["total"].append(r.get("total_s"))
+            groups[key]["tpot"].append(r.get("tpot_s"))
 
     profiles = sorted({k[0] for k in groups.keys()})
     concurrencies = sorted({k[1] for k in groups.keys()})
@@ -94,6 +95,7 @@ def main():
             summary["by_profile"][profile][str(c)] = {
                 "ttft_s": summarize_values(vals["ttft"]),
                 "total_s": summarize_values(vals["total"]),
+                "tpot_s": summarize_values(vals["tpot"]),
             }
 
     out.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")

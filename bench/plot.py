@@ -22,10 +22,10 @@ def main():
     concurrencies = [int(x) for x in summary["concurrencies"]]
     by_profile = summary["by_profile"]
 
-    # 我们画两类图：TTFT 和 TOTAL
+    # 我们画三类图：TTFT / TOTAL / TPOT
     # 每张图画两条线：p50 与 p95
     for profile in profiles:
-        for metric in ("ttft_s", "total_s"):
+        for metric in ("ttft_s", "total_s", "tpot_s"):
             xs = []
             p50s = []
             p95s = []
