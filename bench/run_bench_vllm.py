@@ -32,8 +32,10 @@ async def send_one(client, sem, req, model):
             async for line in resp.aiter_lines():
                 if not line:
                     continue
-                if ttft is None:
+                # Record TTFT on first valid data chunk
+                if ttft is None and line.startswith("data: ") and line != "data: [DONE]":
                     ttft = time.perf_counter() - t0
+
                 # Count output tokens from streaming chunks
                 if line.startswith("data: "):
                     data = line[6:]
@@ -42,7 +44,9 @@ async def send_one(client, sem, req, model):
                             chunk = orjson.loads(data)
                             if "choices" in chunk:
                                 delta = chunk["choices"][0].get("delta", {})
-                                if "content" in delta or delta.get("reasoning_content"):
+                                has_content = delta.get("content")
+                                has_reasoning = delta.get("reasoning_content")
+                                if has_content or has_reasoning:
                                     token_count += 1
                         except orjson.JSONDecodeError:
                             pass
@@ -50,10 +54,10 @@ async def send_one(client, sem, req, model):
         total = time.perf_counter() - t0
 
         # Calculate TPOT: (total - ttft) / (token_count - 1)
-        if token_count > 1:
+        if ttft is not None and token_count > 1:
             tpot = (total - ttft) / (token_count - 1)
         else:
-            tpot = total  # fallback if only one token
+            tpot = total  # fallback
 
     return {
         "id": req["id"],
