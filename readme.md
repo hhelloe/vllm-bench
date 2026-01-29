@@ -75,18 +75,21 @@ H3：当并发升高时，瓶颈会从 GEMM-heavy（prefill）转向 memory-boun
 H4：nsys 上“长块/短块”的比例会随 workload 改变：prefill-heavy → 长块占比上升；decode-heavy → 短碎块密度上升
 
 ### 程序运行前的修改
-加了如下4种情况的请求，并且添加程序让它们按顺序生成，以便于在nsys里观察
+添加了如下4种情况的请求，并且添加程序让它们按顺序生成，以便于在nsys里观察：
+
+```
+tiny 组：
 SS（short prompt, short output）：prompt_rep=40, max_tokens=8
 SL（short prompt, long output）：prompt_rep=40, max_tokens=512
 LS（long prompt, short output）：prompt_rep=400, max_tokens=8
 LL（long prompt, long output）：prompt_rep=400, max_tokens=512
-这一组被我命名为tiny
 
+huge 组：
 SS（short prompt, short output）：prompt_rep=40, max_tokens=1
 SL（short prompt, long output）：prompt_rep=40, max_tokens=512
 LS（long prompt, short output）：prompt_rep=1000, max_tokens=1
 LL（long prompt, long output）：prompt_rep=1000， max_tokens=512
-这一组被我命名为huge
+```
 
 控制的变量如上
 ### 结果
@@ -100,5 +103,5 @@ latency随max_tokens显著增长，说明decode贡献了主要的可变部分，
 c=32：短 prompt + 长输出 TTFT 最大 → decode/调度压力影响首 token
 
 #### tpot
-huge：在max_tokens很短的场景下，TPOT 被固定开销主导（TTFT、调度、kernel launch/同步等难以摊薄），因此平均 TPOT 反而偏大
+huge：在max_tokens很短的场景下，TPOT 被固定开销主导（TTFT、调度、kernel launch/同步等难以摊薄），因此平均 TPOT 反而偏大。
 tiny：低token规模下，常数项（调度、框架、网络）占比高，导致TPOT对工作负载差异不敏感
