@@ -4,6 +4,6 @@ set -euo pipefail
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate vllm
 
-python scripts/gen_workload_random.py \
-  --out workloads/test.jsonl \
+python scripts/gen_workload_sort.py \
+  --out workloads/test_sort.jsonl \
   --n 50
