@@ -90,6 +90,7 @@ LL（long prompt, long output）：prompt_rep=1000， max_tokens=512
 
 控制的变量如上
 ### 结果
+**所有的plot结果都在results/plots里**
 #### total
 latency随max_tokens显著增长，说明decode贡献了主要的可变部分，prefill 更像固定成本
 
