@@ -19,12 +19,13 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
 
     mixes = [
-        {"name": "short_short", "prompt_rep": 400,  "max_tokens": 1, "weight": 0.4},
-        {"name": "long_short",  "prompt_rep": 400, "max_tokens": 1, "weight": 0.4},
-        {"name": "long_long",   "prompt_rep": 400, "max_tokens": 1, "weight": 0.2},
+        {"name": "SS", "prompt_rep": 40,  "max_tokens": 8, "weight": 0.25},
+        {"name": "SL", "prompt_rep": 40, "max_tokens": 512, "weight": 0.25},
+        {"name": "LS", "prompt_rep": 400, "max_tokens": 8, "weight": 0.25},
+        {"name": "LL", "prompt_rep": 400, "max_tokens": 512, "weight": 0.25},
     ]
 
-    # 按顺序生成：先 short_short，再 long_short，最后 long_long
+    # 按顺序生成：先 SS，再 SL，然后 LS，最后 LL
     with out.open("wb") as f:
         req_idx = 0
         for m in mixes:

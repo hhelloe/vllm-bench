@@ -12,17 +12,17 @@ with open("results/raw/vllm_raw.jsonl", "r") as f:
 print(groups.keys())
 
 # 取出某一个 profile
-short_short = groups["short_short"]
-long_short  = groups["long_short"]
-long_long   = groups["long_long"]
+ss = groups["SS"]
+sl = groups["SL"]
+ls = groups["LS"]
+ll = groups["LL"]
 
-print(len(short_short), len(long_short))
 
 filtered = [
     {
         "ttft_s": r["ttft_s"],
     }
-    for r in short_short
+    for r in ss
 ]
 
 print(filtered)

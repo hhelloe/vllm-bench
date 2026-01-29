@@ -19,9 +19,10 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
 
     mixes = [
-        {"name": "short_short", "prompt_rep": 400,  "max_tokens": 1, "weight": 0.4},
-        {"name": "long_short",  "prompt_rep": 400, "max_tokens": 1, "weight": 0.4},
-        {"name": "long_long",   "prompt_rep": 400, "max_tokens": 1, "weight": 0.2},
+        {"name": "SS", "prompt_rep": 40,  "max_tokens": 8, "weight": 0.25},
+        {"name": "SL", "prompt_rep": 40, "max_tokens": 512, "weight": 0.25},
+        {"name": "LS", "prompt_rep": 400, "max_tokens": 8, "weight": 0.25},
+        {"name": "LL", "prompt_rep": 400, "max_tokens": 512, "weight": 0.25},
     ]
 
     weights = [m["weight"] for m in mixes]
